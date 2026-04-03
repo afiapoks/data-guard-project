@@ -26,3 +26,35 @@ class DataGuard:
             self.quarantine_df['error_reason'] = 'Invalid Age'
 
         return self.clean_df, self.quarantine_df
+    
+    def validate_email(self, df_to_check):
+        """Checks if the 'email' column follows a valid pattern."""
+        # This is a 'Regex' pattern for a basic email check
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        
+        # Vectorized check: returns True for valid emails, False for bad ones
+        is_valid_email = df_to_check['email'].str.contains(email_pattern, regex=True, na=False)
+        
+        # Split the data
+        clean = df_to_check[is_valid_email].copy()
+        bad = df_to_check[~is_valid_email].copy()
+        
+        # Add the reason if it failed
+        if not bad.empty:
+            bad['error_reason'] = 'Invalid Email'
+            
+        return clean, bad
+    
+    def validate_name(self, df_to_check):
+        """Checks for missing or empty names."""
+        # .isna() finds empty cells, .str.strip() == "" finds names that are just spaces
+        is_invalid_name = df_to_check['name'].isna() | (df_to_check['name'].str.strip() == "")
+        
+        # We want the VALID ones (not invalid)
+        clean = df_to_check[~is_invalid_name].copy()
+        bad = df_to_check[is_invalid_name].copy()
+        
+        if not bad.empty:
+            bad['error_reason'] = 'Missing Name'
+            
+        return clean, bad
