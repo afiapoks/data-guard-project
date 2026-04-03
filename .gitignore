@@ -1,0 +1,9 @@
+# Ignore Python's internal cache files
+__pycache__/
+*.py[cod]
+
+# Ignore testing tool data
+.pytest_cache/
+
+# Ignore your specific data folders so they stay private
+data/quarantine/
